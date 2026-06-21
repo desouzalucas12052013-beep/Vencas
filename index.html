@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dafer Parfum Pro</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<style>
+:root{
+  --rosa:#c2185b;--rosa2:#880e4f;--rosa3:#f8bbd0;
+  --ouro:#b8860b;--ouro2:#d4af37;--ouro3:#fff8e7;
+  --preto:#1a1a1a;--cinza:#4a4a4a;--cinzac:#e8e8e8;
+  --verde:#1b5e20;--vermelho:#b71c1c;
+  --sombra:0 6px 24px rgba(0,0,0,0.13);
+  --sombra2:0 2px 10px rgba(0,0,0,0.08);
+  --r:16px;--rs:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Georgia,serif;background:#1a0a0f;min-height:100vh;padding-bottom:40px;}
+
+/* ═══ HEADER PREMIUM ═══ */
+.header-wrap{
+  background:linear-gradient(180deg,#0d0005 0%,#1a0010 40%,#2a0018 100%);
+  border-bottom:1px solid #4a1030;
+  padding:0;
+}
+.header-top{
+  display:flex;align-items:center;justify-content:center;
+  padding:20px 16px 16px;
+  gap:18px;
+  position:relative;
+}
+.logo-img{
+  width:100px;height:100px;border-radius:12px;
+  object-fit:cover;
+  border:2px solid var(--ouro2);
+  box-shadow:0 0 24px rgba(212,175,55,0.35),0 0 60px rgba(194,24,91,0.2);
+}
+.header-texto{text-align:left;}
+.header-texto h1{
+  font-size:26px;font-weight:400;letter-spacing:4px;
+  color:#fff;text-transform:uppercase;
+  font-family:Georgia,serif;
+  text-shadow:0 0 20px rgba(212,175,55,0.5);
+}
+.header-texto .parfum{
+  color:var(--ouro2);font-size:11px;letter-spacing:8px;
+  text-transform:uppercase;margin-top:2px;
+  display:flex;align-items:center;gap:6px;
+}
+.header-texto .parfum::before,.header-texto .parfum::after{
+  content:'';flex:1;height:1px;background:var(--ouro2);opacity:.5;max-width:30px;
+}
+.header-texto .slogan{
+  color:#c9a0b0;font-size:10px;letter-spacing:3px;text-transform:uppercase;margin-top:6px;
+}
+.header-divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--ouro2),transparent);
+  opacity:.4;
+  margin:0 20px;
+}
+
+/* alerta de lembrete no topo */
+.alert-lembrete{
+  background:linear-gradient(135deg,#7b1fa2,#4a148c);
+  color:#fff;padding:10px 16px;
+  font-size:13px;text-align:center;
+  border-bottom:1px solid #9c27b0;
+  display:none;
+  animation:pulseAlert 2s infinite;
+}
+@keyframes pulseAlert{0%,100%{background:linear-gradient(135deg,#7b1fa2,#4a148c)}50%{background:linear-gradient(135deg,#9c27b0,#6a1b9a)}}
+
+/* ═══ MENU PREMIUM ═══ */
+.menu{
+  display:flex;gap:4px;overflow-x:auto;
+  background:#0d0005;
+  padding:10px 12px;
+  position:sticky;top:0;z-index:99;
+  border-bottom:1px solid #3a1025;
+  scrollbar-width:none;
+}
+.menu::-webkit-scrollbar{display:none;}
+.menu button{
+  background:transparent;
+  color:#c9a0b0;
+  border:1px solid #3a1025;
+  padding:7px 14px;border-radius:4px;
+  white-space:nowrap;font-size:12px;
+  letter-spacing:.8px;text-transform:uppercase;
+  cursor:pointer;transition:all .25s;
+  flex-shrink:0;width:auto;margin-top:0;
+  font-family:'Segoe UI',serif;
+}
+.menu button:hover,.menu button.ativo{
+  background:linear-gradient(135deg,var(--rosa2),var(--rosa));
+  color:#fff;border-color:var(--ouro2);
+  box-shadow:0 2px 12px rgba(194,24,91,0.4);
+}
+
+/* ═══ TELAS ═══ */
+.tela{display:none;padding:16px 12px;animation:fadeIn .2s ease;}
+.tela.ativa{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ═══ CARD PREMIUM ═══ */
+.card{
+  background:linear-gradient(160deg,#1e0a12,#160610);
+  border:1px solid #3a1025;
+  padding:20px;border-radius:var(--r);
+  margin-bottom:16px;
+  box-shadow:var(--sombra);
+  position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--ouro2),transparent);
+}
+.card h2{
+  color:#e8c8d4;font-size:15px;margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+  text-transform:uppercase;letter-spacing:2px;
+  font-weight:400;
+}
+.card h3{
+  color:var(--ouro2);font-size:11px;margin:18px 0 10px;
+  letter-spacing:2px;text-transform:uppercase;
+  border-bottom:1px solid #3a1025;padding-bottom:8px;
+}
+
+/* ═══ KPI CARDS ═══ */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.kpi{
+  border-radius:var(--rs);padding:16px 12px;
+  text-align:center;position:relative;overflow:hidden;
+  border:1px solid #3a1025;
+}
+.kpi.kpi-ouro{background:linear-gradient(135deg,#1a0e00,#2a1800);border-color:#6a4a00;}
+.kpi.kpi-verde{background:linear-gradient(135deg,#001a08,#002a10);border-color:#1b5e20;}
+.kpi.kpi-azul{background:linear-gradient(135deg,#000d1a,#00102a);border-color:#0d2a5e;}
+.kpi.kpi-rosa{background:linear-gradient(135deg,#1a0010,#2a0018);border-color:#5e0d2a;}
+.kpi.kpi-roxo{background:linear-gradient(135deg,#0d0018,#18003a);border-color:#3a1060;}
+.kpi .icon{font-size:22px;}
+.kpi .val{font-size:18px;font-weight:700;margin:4px 0;color:#fff;}
+.kpi .lbl{font-size:9px;opacity:.6;text-transform:uppercase;letter-spacing:1px;color:#e8c8d4;}
+.kpi-ouro .val{color:#d4af37;}
+.kpi-verde .val{color:#4caf50;}
+.kpi-azul .val{color:#64b5f6;}
+.kpi-roxo .val{color:#ce93d8;}
+
+/* DÍZIMO no início */
+.dizimo-inicio{
+  background:linear-gradient(135deg,#0d001a,#1a0030);
+  border:1px solid #5e1090;
+  border-radius:var(--rs);padding:16px;
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:16px;
+}
+.dizimo-inicio .di-icon{font-size:32px;flex-shrink:0;}
+.dizimo-inicio .di-info .di-label{font-size:10px;color:#c9a0e0;letter-spacing:2px;text-transform:uppercase;}
+.dizimo-inicio .di-info .di-val{font-size:24px;font-weight:700;color:#ce93d8;}
+.dizimo-inicio .di-info .di-sub{font-size:11px;color:#888;margin-top:2px;}
+
+/* ═══ INPUTS PREMIUM ═══ */
+input,select{
+  width:100%;padding:11px 14px;margin-top:9px;
+  border-radius:var(--rs);font-size:14px;
+  border:1px solid #3a1025;
+  background:#0d0008;color:#e8c8d4;
+  transition:border .2s;outline:none;
+}
+input:focus,select:focus{border-color:var(--ouro2);background:#120010;}
+input::placeholder{color:#5a3045;}
+select option{background:#1a0010;color:#e8c8d4;}
+label{font-size:10px;color:#8a6070;font-weight:700;margin-top:12px;display:block;text-transform:uppercase;letter-spacing:1px;}
+
+/* ═══ BOTÕES PREMIUM ═══ */
+button{width:100%;padding:13px;margin-top:12px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;letter-spacing:1px;text-transform:uppercase;}
+.btn-r{background:linear-gradient(135deg,var(--rosa2),var(--rosa));color:#fff;box-shadow:0 4px 14px rgba(194,24,91,0.4);}
+.btn-r:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(194,24,91,0.5);}
+.btn-g{background:linear-gradient(135deg,#1b5e20,#2e7d32);color:#fff;box-shadow:0 4px 14px rgba(27,94,32,0.4);}
+.btn-roxo{background:linear-gradient(135deg,#4a148c,#6a1b9a);color:#fff;box-shadow:0 4px 14px rgba(74,20,140,0.4);}
+.btn-del{background:transparent;color:#c62828;border:1px solid #c62828;padding:5px 10px;font-size:11px;width:auto;margin-top:0;border-radius:4px;}
+.btn-del:hover{background:#c62828;color:#fff;}
+.btn-pagar{background:transparent;color:#4caf50;border:1px solid #4caf50;padding:5px 10px;font-size:11px;width:auto;margin-top:0;border-radius:4px;}
+.btn-pagar:hover{background:#4caf50;color:#fff;}
+.btn-whats{
+  background:linear-gradient(135deg,#075e54,#25d366);
+  color:#fff;
+  padding:7px 10px;
+  font-size:10px;
+  width:auto;
+  margin-top:6px;
+  border-radius:6px;
+}
+.btn-whats:hover{transform:translateY(-1px);}
+
+
+/* ═══ TABELAS PREMIUM ═══ */
+.box-table{overflow-x:auto;margin-top:12px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:linear-gradient(135deg,#1a0010,#2a0018);color:var(--ouro2);padding:10px 8px;text-align:left;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid #4a1030;}
+td{padding:10px 8px;border-bottom:1px solid #1a0810;color:#d0b0be;vertical-align:middle;}
+tr:hover td{background:#200a14;}tr:last-child td{border-bottom:none;}
+
+/* lucro na tabela */
+.lucro-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  background:#001a08;border:1px solid #1b5e20;
+  color:#4caf50;border-radius:50px;
+  padding:3px 10px;font-size:11px;font-weight:700;
+}
+
+/* BADGE */
+.badge{display:inline-block;padding:3px 9px;border-radius:50px;font-size:10px;font-weight:700;letter-spacing:.5px;}
+.b-fem{background:#2a0018;color:#f48fb1;border:1px solid #880e4f;}
+.b-mas{background:#001020;color:#81d4fa;border:1px solid #1565c0;}
+.b-uni{background:#001a08;color:#a5d6a7;border:1px solid #1b5e20;}
+.b-n{background:#1a1a1a;color:#888;border:1px solid #333;}
+
+/* LEMBRETE */
+.lem-item{
+  display:flex;justify-content:space-between;align-items:center;
+  background:#0d0008;border-left:3px solid var(--ouro2);
+  border-radius:6px;padding:10px 14px;margin-top:8px;
+  font-size:13px;color:#c0a0b0;
+}
+.lem-item.hoje{
+  border-left-color:#9c27b0;background:#0d001a;
+  box-shadow:0 0 12px rgba(156,39,176,0.3);
+  animation:pulseLem 2s infinite;
+}
+.lem-item.passado{border-left-color:#c62828;background:#1a0000;opacity:.7;}
+@keyframes pulseLem{0%,100%{box-shadow:0 0 12px rgba(156,39,176,0.3)}50%{box-shadow:0 0 20px rgba(156,39,176,0.6)}}
+
+/* CALENDÁRIO DE PAGAMENTOS */
+.cal-item{
+  display:flex;gap:12px;align-items:center;
+  border-radius:8px;padding:13px;margin-top:10px;font-size:13px;
+  border:1px solid #3a1025;
+}
+.cal-item.cal-pode{background:#001a08;border-color:#1b5e20;}
+.cal-item.cal-hoje{background:#0d001a;border-color:#9c27b0;box-shadow:0 0 14px rgba(156,39,176,0.25);}
+.cal-item.cal-futuro{background:#0d0008;border-color:#3a1025;opacity:.75;}
+.cal-item.cal-vencido{background:#1a0000;border-color:#c62828;}
+.cal-data{
+  border-radius:8px;padding:8px 10px;text-align:center;
+  font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;min-width:58px;
+}
+.cal-pode .cal-data{background:#1b5e20;color:#fff;}
+.cal-hoje .cal-data{background:#7b1fa2;color:#fff;}
+.cal-futuro .cal-data{background:#1a0a10;color:#8a6070;border:1px solid #3a1025;}
+.cal-vencido .cal-data{background:#b71c1c;color:#fff;}
+.cal-tag{display:inline-block;padding:2px 8px;border-radius:50px;font-size:10px;font-weight:700;margin-top:4px;}
+.tag-pode{background:#1b5e20;color:#a5d6a7;}
+.tag-hoje{background:#7b1fa2;color:#e1bee7;}
+.tag-futuro{background:#1a0a10;color:#666;border:1px solid #333;}
+.tag-vencido{background:#b71c1c;color:#ffcdd2;}
+
+/* RANKING */
+.rank-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:8px;margin-bottom:8px;
+  background:#0d0008;border:1px solid #2a0018;
+}
+.rn{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;}
+.r1{background:linear-gradient(135deg,#b8860b,#d4af37);color:#fff;}
+.r2{background:#555;color:#fff;}
+.r3{background:#6d4c41;color:#fff;}
+.rx{background:#1a0010;color:#c9a0b0;font-size:11px;}
+
+/* DÍZIMO TELA */
+.diz-box{background:linear-gradient(135deg,#0d001a,#18003a);border:1px solid #6a1b9a;border-radius:var(--rs);padding:18px;margin-top:12px;}
+.diz-val{font-size:32px;font-weight:700;color:#ce93d8;margin:6px 0;}
+.diz-sub{font-size:12px;color:#888;}
+.diz-hist{background:#0d0008;border-radius:8px;padding:10px;margin-top:10px;}
+.diz-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1a0810;}
+.diz-row:last-child{border-bottom:none;}
+
+/* RESUMO VENDA */
+.resumo{background:#001a08;border:1px solid #1b5e20;border-radius:var(--rs);padding:12px;margin-top:12px;font-size:13px;color:#a5d6a7;display:none;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);color:#fff;padding:12px 28px;border-radius:4px;font-size:13px;z-index:9999;transition:transform .3s;box-shadow:0 4px 20px rgba(0,0,0,0.5);white-space:nowrap;pointer-events:none;letter-spacing:.5px;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.ok{background:linear-gradient(135deg,#1b5e20,#2e7d32);}
+.toast.err{background:linear-gradient(135deg,#b71c1c,#c62828);}
+
+/* VAZIO / ERRO */
+.vazio{text-align:center;color:#3a1025;font-size:13px;padding:28px;letter-spacing:1px;}
+.erro-msg{color:#c62828;font-size:12px;padding:10px;background:#1a0000;border:1px solid #4a0000;border-radius:6px;margin-top:8px;}
+
+/* SEPARADOR OURO */
+.divider-ouro{height:1px;background:linear-gradient(90deg,transparent,var(--ouro2),transparent);opacity:.3;margin:16px 0;}
+
+@media(max-width:480px){
+  .header-texto h1{font-size:20px;}
+  .logo-img{width:72px;height:72px;}
+  th,td{font-size:11px;padding:7px 5px;}
+  .kpi .val{font-size:16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="header-wrap">
+  <div class="alert-lembrete" id="alertLembrete">🔔</div>
+  <div class="header-top">
+    <img class="logo-img" src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663779750513/UwCoHvAwmxrTomJb.jpg" onerror="this.src='https://via.placeholder.com/100?text=Dafer'">
+    <div class="header-texto">
+      <h1>Dafer</h1>
+      <div class="parfum">Parfum</div>
+      <div class="slogan">Onde o luxo encontra sua essência</div>
+    </div>
+  </div>
+  <div class="header-divider"></div>
+</div>
+
+<!-- ═══ MENU ═══ -->
+<div class="menu">
+  <button class="ativo" onclick="abrir('inicio',this)">🏠 Início</button>
+  <button onclick="abrir('produtos',this)">📦 Produtos</button>
+  <button onclick="abrir('clientes',this)">👤 Clientes</button>
+  <button onclick="abrir('vendas',this)">🛒 Vendas</button>
+  <button onclick="abrir('pagamentos',this)">📅 Pagamentos</button>
+  <button onclick="abrir('relatorios',this)">📊 Relatórios</button>
+</div>
+
+<!-- ═══ TELAS ═══ -->
+
+<!-- ══ INÍCIO ══ -->
+<div id="inicio" class="tela ativa">
+  <div class="dizimo-inicio">
+    <div class="di-icon">🙏</div>
+    <div class="di-info">
+      <div class="di-label">Dízimo do Mês</div>
+      <div class="di-val" id="dizimoInicioVal">R$ 0,00</div>
+      <div class="di-sub" id="dizimoInicioSub">Baseado no lucro total</div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi kpi-ouro">
+      <div class="icon">💰</div>
+      <div class="val" id="kFat">R$ 0,00</div>
+      <div class="lbl">Faturamento</div>
+    </div>
+    <div class="kpi kpi-verde">
+      <div class="icon">📈</div>
+      <div class="val" id="kLucro">R$ 0,00</div>
+      <div class="lbl">Lucro Líquido</div>
+    </div>
+    <div class="kpi kpi-azul">
+      <div class="icon">👤</div>
+      <div class="val" id="kClientes">0</div>
+      <div class="lbl">Clientes</div>
+    </div>
+    <div class="kpi kpi-rosa">
+      <div class="icon">📦</div>
+      <div class="val" id="kEstoque">0</div>
+      <div class="lbl">Itens Estoque</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🙏 Calculadora de Dízimo</h2>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
+      <div>
+        <label>Valor para calcular (R$)</label>
+        <input id="calcDizimoInput" type="number" step="0.01" placeholder="0.00">
+      </div>
+      <button class="btn-roxo" onclick="calcularDizimoManual()" style="margin-top:0;width:auto;padding:11px 20px;">Calcular</button>
+    </div>
+    <div id="resDizimoManual" style="margin-top:15px;padding:12px;background:#0d001a;border:1px solid #4a148c;border-radius:var(--rs);display:none;">
+      <span style="font-size:12px;color:#c9a0e0;text-transform:uppercase;letter-spacing:1px;">Resultado (10%):</span>
+      <div id="resDizimoVal" style="font-size:24px;font-weight:700;color:#ce93d8;margin-top:4px;">R$ 0,00</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🔔 Lembretes Importantes</h2>
+    <div id="listaLembretes"></div>
+    <div class="divider-ouro"></div>
+    <label>Novo Lembrete</label>
+    <input id="textoLembrete" placeholder="O que você precisa lembrar?">
+    <input id="dataLembrete" type="date">
+    <button class="btn-r" onclick="addLembrete()">Adicionar Lembrete</button>
+  </div>
+</div>
+
+<!-- ══ PRODUTOS ══ -->
+<div id="produtos" class="tela">
+  <div class="card">
+    <h2>✨ Novo Produto</h2>
+    <label>Nome do Perfume</label>
+    <input id="pNome" placeholder="Ex: Chanel Nº 5">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><label>Preço Compra</label><input id="pCompra" type="number" step="0.01" placeholder="0.00"></div>
+      <div><label>Preço Venda</label><input id="pVenda" type="number" step="0.01" placeholder="0.00"></div>
+    </div>
+    <label>Estoque Inicial</label>
+    <input id="pEstoque" type="number" placeholder="0">
+    <label>Gênero</label>
+    <select id="pGenero">
+      <option>Feminino</option>
+      <option>Masculino</option>
+      <option>Unissex</option>
+      <option>Não informado</option>
+    </select>
+    <button class="btn-r" onclick="addPerfume()">💾 Salvar Produto</button>
+  </div>
+  <div class="card">
+    <h2>📦 Estoque Atual</h2>
+    <div class="box-table">
+      <table>
+        <thead><tr><th>Nome</th><th>Gênero</th><th>Compra</th><th>Venda</th><th>Lucro/un</th><th>Lucro Total</th><th>Qtd</th><th></th></tr></thead>
+        <tbody id="tbProdutos"><tr><td colspan="8" class="vazio">Aguardando...</td></tr></tbody>
+      </table>
+    </div>
+    <div id="erroProdutos"></div>
+  </div>
+</div>
+
+<!-- ══ CLIENTES ══ -->
+<div id="clientes" class="tela">
+  <div class="card">
+    <h2>👤 Novo Cliente</h2>
+    <label>Nome *</label>
+    <input id="cNome" placeholder="Nome completo">
+    <label>Telefone</label>
+    <input id="cTelefone" placeholder="(00) 00000-0000" type="tel">
+    <label>Nº de Parcelas</label>
+    <input id="cParcelas" type="number" min="1" placeholder="1">
+    <label>Valor da Dívida (R$)</label>
+    <input id="cDivida" type="number" min="0" step="0.01" placeholder="0.00">
+    <label>Data de Vencimento</label>
+    <input id="cData" type="date">
+    <button class="btn-r" onclick="addCliente()">💾 Salvar Cliente</button>
+  </div>
+  <div class="card">
+    <h2>👥 Lista de Clientes</h2>
+    <div class="box-table">
+      <table>
+        <thead><tr><th>Nome</th><th>Telefone</th><th>Dívida</th><th>Parcelas</th><th>Vencimento</th><th></th></tr></thead>
+        <tbody id="tbClientes"><tr><td colspan="6" class="vazio">Nenhum cliente ainda.</td></tr></tbody>
+      </table>
+    </div>
+    <div id="erroClientes"></div>
+  </div>
+</div>
+
+<!-- ══ VENDAS ══ -->
+<div id="vendas" class="tela">
+  <div class="card">
+    <h2>🛒 Registrar Venda</h2>
+    <label>Cliente (opcional)</label>
+    <select id="vCliente"><option value="">— Sem cliente —</option></select>
+    <label>Perfumes *</label>
+    <div id="listaVendaProdutos"></div>
+    <button class="btn-r" onclick="addLinhaVenda()">+ Adicionar outro perfume</button>
+    
+    <label>Desconto Total (R$)</label>
+    <input id="vDesconto" type="number" step="0.01" oninput="resumoVenda()" placeholder="0.00">
+
+    <label>Quem vendeu</label><input id="vVendedor" placeholder="Nome de quem vendeu" value="Fernanda">
+    <label>Forma de pagamento</label><select id="vPagamento"><option value="Pix">Pix</option><option value="Dinheiro">Dinheiro</option><option value="Cartão de Crédito">Cartão de Crédito</option><option value="Cartão de Débito">Cartão de Débito</option><option value="Fiado">Fiado</option></select>
+
+    <label>Observação</label><textarea id="vObs" style="width:100%;margin-top:9px;padding:11px;background:#0d0008;color:#e8c8d4;border:1px solid #3a1025;border-radius:var(--rs);outline:none;"></textarea>
+    <div class="resumo" id="resumoDiv"></div>
+    <button class="btn-g" onclick="vender()">✅ Finalizar Venda</button>
+  </div>
+  <div class="card">
+    <h2>📋 Histórico de Vendas</h2>
+    <div class="box-table">
+      <table>
+        <thead><tr><th>Produto</th><th>Cliente</th><th>Qtd</th><th>Total</th><th>Desconto</th><th>Pagamento</th><th>Vendedor</th><th>Comissão</th><th>Data</th><th>Obs</th><th></th></tr></thead>
+        <tbody id="tbVendas"><tr><td colspan="10" class="vazio">Nenhuma venda ainda.</td></tr></tbody>
+      </table>
+    </div>
+    <div id="erroVendas"></div>
+  </div>
+</div>
+<!-- ══ PAGAMENTOS ══ -->
+<div id="pagamentos" class="tela">
+  <div class="card">
+    <h2>📅 Calendário de Pagamentos</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+      <span class="cal-tag" style="background:#4caf50;color:#fff">✅ Pago (Verde)</span>
+      <span class="cal-tag" style="background:#ffd740;color:#000">🟡 Pendente (Amarelo)</span>
+      <span class="cal-tag" style="background:#7b1fa2;color:#fff">🔔 Cobrar (Roxo)</span>
+      <span class="cal-tag" style="background:#f44336;color:#fff">🔴 Vencido (Vermelho)</span>
+    </div>
+    <div id="listaCal"><div class="vazio">Nenhum pagamento agendado.</div></div>
+  </div>
+</div>
+
+<!-- ══ RELATÓRIOS ══ -->
+<div id="relatorios" class="tela">
+  <div class="card">
+    <h2>📊 Relatórios</h2>
+    <h3>🏆 Ranking de Vendas</h3>
+    <div id="rRanking"><div class="vazio">Sem dados.</div></div>
+    <h3>💰 Mais Lucrativos</h3>
+    <div id="rLucro"><div class="vazio">Sem dados.</div></div>
+    <h3>📅 Vendas por Mês</h3>
+    <div id="rMeses"><div class="vazio">Sem dados.</div></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+//  FIREBASE
+// ═══════════════════════════════════════
+const firebaseConfig={
+  apiKey:"AIzaSyDRDC38Z-gln6hAvK4xtkAYij5_M2TvYRk",
+  authDomain:"dafer-2d4af.firebaseapp.com",
+  projectId:"dafer-2d4af",
+  storageBucket:"dafer-2d4af.firebasestorage.app",
+  messagingSenderId:"1043309416391",
+  appId:"1:1043309416391:web:477f1eb8681cf5428c93e2"
+};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
+
+let perfumes=[],clientes=[],vendas=[],lucroTotal=0;
+
+function vendedorEhJurema(nome){
+  if(!nome) return false;
+  nome = nome.toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .trim();
+  const variacoes=["jurema","jurena","jurem","juremma","jureima","jureema"];
+  return variacoes.some(v=>nome.includes(v));
+}
+
+
+// ═══════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════
+function R$(v){return 'R$ '+Number(v||0).toFixed(2).replace('.',',');}
+
+function dataBR(d){
+  if(!d)return '—';
+  if(d&&d.toDate)d=d.toDate();
+  if(typeof d==='string'&&d.match(/^\d{4}-\d{2}-\d{2}$/)){
+    const [y,m,dd]=d.split('-');
+    return `${dd}/${m}/${y}`;
+  }
+  const dt=new Date(d);
+  if(isNaN(dt.getTime()))return String(d);
+  return dt.toLocaleDateString('pt-BR');
+}
+
+function compararData(strData){
+  if(!strData)return null;
+  const hoje=new Date();
+  const [y,m,d]=strData.split('-').map(Number);
+  const hojeY=hoje.getFullYear(),hojeM=hoje.getMonth()+1,hojeD=hoje.getDate();
+  if(y===hojeY&&m===hojeM&&d===hojeD)return 'hoje';
+  if(y<hojeY||(y===hojeY&&m<hojeM)||(y===hojeY&&m===hojeM&&d<hojeD))return 'passado';
+  return 'futuro';
+}
+
+function genBadge(g){
+  const m={Feminino:'b-fem',Masculino:'b-mas',Unissex:'b-uni'};
+  return `<span class="badge ${m[g]||'b-n'}">${g||'—'}</span>`;
+}
+
+function toast(msg,t='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className=`toast ${t} show`;
+  clearTimeout(el._t);el._t=setTimeout(()=>el.className='toast',3200);
+}
+function limpar(...ids){ids.forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});}
+function erroEl(id,msg){const el=document.getElementById(id);if(el)el.innerHTML=msg?`<div class="erro-msg">⚠️ ${msg}</div>`:'';}
+
+// ═══════════════════════════════════════
+//  NAVEGAÇÃO
+// ═══════════════════════════════════════
+function abrir(id,btn){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  document.querySelectorAll('.menu button').forEach(b=>b.classList.remove('ativo'));
+  document.getElementById(id).classList.add('ativa');
+  if(btn)btn.classList.add('ativo');
+}
+
+// ═══════════════════════════════════════
+//  LEMBRETES
+// ═══════════════════════════════════════
+function addLembrete(){
+  const txt=document.getElementById('textoLembrete').value.trim();
+  const dt =document.getElementById('dataLembrete').value;
+  if(!txt){toast('Digite o lembrete!','err');return;}
+  db.collection('lembretes').add({texto:txt,data:dt,criadoEm:new Date()})
+    .then(()=>{limpar('textoLembrete','dataLembrete');toast('Lembrete adicionado!');})
+    .catch(e=>toast('Erro: '+e.message,'err'));
+}
+
+db.collection('lembretes').onSnapshot(
+  snap=>{
+    const el=document.getElementById('listaLembretes');
+    const alertDiv=document.getElementById('alertLembrete');
+    if(!el) return;
+    if(snap.empty){el.innerHTML='<div class="vazio">Nenhum lembrete.</div>';alertDiv.style.display='none';return;}
+    const docs=[];
+    snap.forEach(d=>docs.push({id:d.id,...d.data()}));
+    docs.sort((a,b)=>(a.data||'9').localeCompare(b.data||'9'));
+
+    const lembretes_hoje=docs.filter(l=>compararData(l.data)==='hoje');
+    if(lembretes_hoje.length){
+      alertDiv.style.display='block';
+      alertDiv.textContent='🔔 LEMBRETE DE HOJE: '+lembretes_hoje.map(l=>l.texto).join(' | ');
+    } else {
+      alertDiv.style.display='none';
+    }
+
+    el.innerHTML=docs.map(l=>{
+      const cmp=compararData(l.data);
+      let cls='',tag='';
+      if(cmp==='hoje'){cls='hoje';tag='<span style="font-size:10px;background:#7b1fa2;color:#fff;padding:2px 8px;border-radius:50px;margin-left:6px">🔔 HOJE!</span>';}
+      else if(cmp==='passado'){cls='passado';tag='<span style="font-size:10px;color:#888;margin-left:6px">passado</span>';}
+      const dataStr = l.data ? ` — <b style="color:#d4af37">${dataBR(l.data)}</b>${tag}` : '';
+      return `<div class="lem-item ${cls}">
+        <span>🔔 ${l.texto}${dataStr}</span>
+        <button class="btn-del" onclick="del('lembretes','${l.id}')">🗑</button>
+      </div>`;
+    }).join('');
+  },
+  err=>{console.error('Lembretes:',err);}
+);
+
+// ═══════════════════════════════════════
+//  PRODUTOS
+// ═══════════════════════════════════════
+function addPerfume(){
+  const nome   =document.getElementById('pNome').value.trim();
+  const compra =parseFloat(document.getElementById('pCompra').value)||0;
+  const venda  =parseFloat(document.getElementById('pVenda').value)||0;
+  const estoque=parseInt(document.getElementById('pEstoque').value)||0;
+  const genero =document.getElementById('pGenero').value;
+  if(!nome){toast('Informe o nome!','err');return;}
+  if(compra<=0||venda<=0){toast('Informe os preços!','err');return;}
+  if(estoque<=0){toast('Informe a quantidade!','err');return;}
+  db.collection('perfumes').where('nome','==',nome).get()
+    .then(snap=>{
+      if(!snap.empty){
+        const doc=snap.docs[0];
+        return db.collection('perfumes').doc(doc.id)
+          .update({estoque:doc.data().estoque+estoque})
+          .then(()=>toast('Estoque atualizado!'));
+      }
+      return db.collection('perfumes').add({nome,compra,venda,estoque,genero,vendidos:0})
+        .then(()=>toast('Produto adicionado!'));
+    })
+    .then(()=>{limpar('pNome','pCompra','pVenda','pEstoque');document.getElementById('pGenero').value='Não informado';})
+    .catch(e=>{toast('Erro: '+e.message,'err');console.error(e);});
+}
+
+db.collection('perfumes').onSnapshot(
+  snap=>{
+    perfumes=[];
+    const tb=document.getElementById('tbProdutos');
+    let tot=0;
+    tb.innerHTML='';
+    if(snap.empty){
+      tb.innerHTML='<tr><td colspan="8" class="vazio">Nenhum produto cadastrado.</td></tr>';
+      document.getElementById('kEstoque').textContent='0';
+      return;
+    }
+    snap.forEach(d=>{
+      const p={id:d.id,...d.data()};
+      perfumes.push(p);
+      tot+=(p.estoque||0);
+      const lucUn=p.venda-p.compra;
+      const lucTot=lucUn*(p.vendidos||0);
+      const mg=p.compra>0?((lucUn/p.compra)*100).toFixed(0):0;
+      tb.innerHTML+=`<tr>
+        <td><b style="color:#e8c8d4">${p.nome}</b></td>
+        <td>${genBadge(p.genero)}</td>
+        <td style="color:#8a6070">${R$(p.compra)}</td>
+        <td style="color:#e8c8d4">${R$(p.venda)}</td>
+        <td><span class="lucro-pill">+${R$(lucUn)} <small style="opacity:.7">(${mg}%)</small></span></td>
+        <td><span class="lucro-pill">+${R$(lucTot)}</span></td>
+        <td><input type="number" value="${p.estoque}" onchange="updateDoc('perfumes','${p.id}',{estoque:parseInt(this.value)})" style="width:60px;padding:4px;margin:0;background:transparent;border:1px solid #3a1025;color:#d4af37;font-weight:700;text-align:center"></td>
+        <td><button class="btn-del" onclick="del('perfumes','${p.id}')">🗑</button></td>
+      </tr>`;
+    });
+    atualizarSelectsVenda();
+    document.getElementById('kEstoque').textContent=tot;
+    erroEl('erroProdutos','');
+    renderRelatorios();
+  },
+  err=>{erroEl('erroProdutos','Erro ao carregar. Verifique as regras do Firestore.');console.error(err);}
+);
+
+// ═══════════════════════════════════════
+//  CLIENTES
+// ═══════════════════════════════════════
+
+function formatarTelefoneWhatsApp(tel){
+  let n=String(tel||'').replace(/\D/g,'');
+  if(!n) return '';
+  if(n.startsWith('55')) return '+'+n;
+  return '+55'+n;
+}
+
+function abrirWhatsAppCobranca(nome, telefone, valor, dataVencimento, statusParcela){
+  const tel=formatarTelefoneWhatsApp(telefone);
+
+  if(!tel || tel.length < 13){
+    toast('Cliente sem telefone válido cadastrado!','err');
+    return;
+  }
+
+  let texto='';
+
+  if(statusParcela==='Cobrar'){
+    texto=`Olá ${nome}, passando para lembrar da sua parcela da Dafer Parfum que vence hoje no valor de R$ ${valor}.`;
+  }else if(statusParcela==='Atrasado'){
+    texto=`Olá ${nome}, passando para lembrar que sua parcela da Dafer Parfum está em atraso no valor de R$ ${valor}.`;
+  }else if(statusParcela==='Pago'){
+    texto=`Olá ${nome}, identificamos que sua parcela da Dafer Parfum foi paga. Obrigado pela preferência!`;
+  }else{
+    texto=`Olá ${nome}, passando para lembrar da sua parcela da Dafer Parfum que vence em ${dataVencimento} no valor de R$ ${valor}.`;
+  }
+
+  const url=`https://wa.me/${tel.replace('+','')}?text=${encodeURIComponent(texto)}`;
+  window.open(url,'_blank');
+}
+
+function addCliente(){
+  const nome    =document.getElementById('cNome').value.trim();
+  const tel     =formatarTelefoneWhatsApp(document.getElementById('cTelefone').value.trim());
+  const parcelas=parseInt(document.getElementById('cParcelas').value)||1;
+  const divida  =parseFloat(document.getElementById('cDivida').value)||0;
+  const data    =document.getElementById('cData').value;
+  if(!nome){toast('Informe o nome!','err');return;}
+  db.collection('clientes').add({nome,telefone:tel,parcelas,divida,data,statusParcelas:{},statusGeral:'Pendente'})
+    .then(()=>{limpar('cNome','cTelefone','cParcelas','cDivida','cData');toast('Cliente salvo!');})
+    .catch(e=>{toast('Erro: '+e.message,'err');console.error(e);});
+}
+
+db.collection('clientes').onSnapshot(
+  snap=>{
+    clientes=[];
+    const tb =document.getElementById('tbClientes');
+    const sel=document.getElementById('vCliente');
+    const cal=document.getElementById('listaCal');
+    tb.innerHTML='';
+    sel.innerHTML='<option value="">— Sem cliente —</option>';
+    if(snap.empty){
+      tb.innerHTML='<tr><td colspan="6" class="vazio">Nenhum cliente.</td></tr>';
+      cal.innerHTML='<div class="vazio">Nenhum pagamento agendado.</div>';
+      document.getElementById('kClientes').textContent='0';
+      return;
+    }
+    const docs=[];
+    snap.forEach(d=>docs.push({id:d.id,...d.data()}));
+    docs.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+
+    let calItems=[];
+    docs.forEach(c=>{
+      clientes.push(c);
+      const numParcelas = parseInt(c.parcelas) || 1;
+      const statusP = c.statusParcelas || {};
+      
+      let pagas = 0;
+      for(let k in statusP) if(statusP[k]==='Pago') pagas++;
+      
+      tb.innerHTML+=`<tr>
+        <td><b style="color:#e8c8d4">${c.nome}</b></td>
+        <td style="color:#8a6070">${c.telefone||'—'}</td>
+        <td style="color:#c62828"><b>${R$(c.divida)}</b></td>
+        <td style="color:#8a6070">${pagas}/${numParcelas}</td>
+        <td style="color:#8a6070">${dataBR(c.data)}</td>
+        <td><button class="btn-del" onclick="del('clientes','${c.id}')">🗑</button></td>
+      </tr>`;
+      sel.innerHTML+=`<option value="${c.id}">${c.nome}</option>`;
+
+      if(c.data && c.divida > 0){
+        const valorParcela = c.divida / numParcelas;
+        const dataBase = new Date(c.data + 'T12:00:00');
+        
+        for(let i=0; i<numParcelas; i++){
+          let dataParc = new Date(dataBase);
+          dataParc.setMonth(dataBase.getMonth() + i);
+          const dataStr = dataParc.toISOString().split('T')[0];
+          const cmp = compararData(dataStr);
+          
+          let sP = statusP[i+1] || 'Pendente';
+          
+          // Lógica de Status Automático (apenas se for Pendente):
+          if(sP === 'Pendente'){
+            if(cmp === 'hoje') sP = 'Cobrar';
+            else if(cmp === 'passado') sP = 'Atrasado';
+          }
+          
+          let calClass='cal-futuro', tagHTML=`<span class="cal-tag" style="background:#ffd740;color:#000">Pendente</span>`;
+          
+          if(sP === 'Pago'){
+            calClass='cal-pode';
+            tagHTML=`<span class="cal-tag" style="background:#4caf50;color:#fff">Pago</span>`;
+          } else if(sP === 'Cobrar'){
+             calClass='cal-hoje';
+             tagHTML=`<span class="cal-tag" style="background:#7b1fa2;color:#fff">Cobrar</span>`;
+          } else if(sP === 'Atrasado'){
+            calClass='cal-vencido';
+            tagHTML=`<span class="cal-tag" style="background:#f44336;color:#fff">Vencido</span>`;
+          } else {
+            // Futuro e Pendente
+            calClass='cal-futuro';
+            tagHTML=`<span class="cal-tag" style="background:#ffd740;color:#000">Pendente</span>`;
+          }
+          
+          calItems.push({
+            data: dataStr,
+            html: `<div class="cal-item ${calClass}">
+              <div class="cal-data">📅<br>${dataBR(dataStr)}</div>
+              <div style="flex:1">
+                <b style="color:#e8c8d4">${c.nome}</b> <small style="opacity:.7">(${i+1}/${numParcelas})</small><br>
+                <span style="font-size:12px;color:#8a6070">Valor: <b>${R$(valorParcela)}</b></span><br>
+                ${tagHTML}
+              </div>
+              <div style="text-align:right">
+                <select onchange="alterarStatusParcelaIndividual('${c.id}', ${i+1}, this.value)" style="width:100px;font-size:10px;padding:4px;margin-top:5px;background:#0d0008;border:1px solid #3a1025;color:#e8c8d4;border-radius:4px">
+                  <option value="Pendente" ${sP==='Pendente'?'selected':''}>Pendente</option>
+                  <option value="Pago" ${sP==='Pago'?'selected':''}>Pago</option>
+                  <option value="Cobrar" ${sP==='Cobrar'?'selected':''}>Cobrar</option>
+                  <option value="Atrasado" ${sP==='Atrasado'?'selected':''}>Vencido</option>
+                </select>
+                <button class="btn-whats" onclick="abrirWhatsAppCobranca('${c.nome.replace(/'/g,"\\'")}', '${c.telefone||''}', '${R$(valorParcela)}', '${dataBR(dataStr)}', '${sP}')">📲 Enviar Cobrança</button>
+              </div>
+            </div>`
+          });
+        }
+      }
+    });
+    calItems.sort((a,b)=>a.data.localeCompare(b.data));
+    cal.innerHTML = calItems.map(x=>x.html).join('') || '<div class="vazio">Nenhum pagamento agendado.</div>';
+    document.getElementById('kClientes').textContent=clientes.length;
+    erroEl('erroClientes','');
+  },
+  err=>{erroEl('erroClientes','Erro ao carregar clientes.');console.error(err);}
+);
+
+function alterarStatusParcelaIndividual(clienteId, parcelaNum, status){
+  const cliente = clientes.find(c => c.id === clienteId);
+  if(!cliente) return;
+  
+  let statusP = cliente.statusParcelas || {};
+  statusP[parcelaNum] = status;
+  
+  let pagas = 0;
+  for(let k in statusP) if(statusP[k]==='Pago') pagas++;
+  
+  let updateData = {statusParcelas: statusP};
+  if(pagas >= cliente.parcelas) updateData.statusGeral = 'Pago';
+  
+  updateDoc('clientes', clienteId, updateData);
+}
+
+// ═══════════════════════════════════════
+//  DÍZIMO MANUAL
+// ═══════════════════════════════════════
+function calcularDizimoManual(){
+  const val = parseFloat(document.getElementById('calcDizimoInput').value) || 0;
+  const resDiv = document.getElementById('resDizimoManual');
+  const resVal = document.getElementById('resDizimoVal');
+  if(val <= 0){
+    resDiv.style.display = 'none';
+    toast('Informe um valor válido!','err');
+    return;
+  }
+  const dezPorcento = val * 0.10;
+  resVal.textContent = R$(dezPorcento);
+  resDiv.style.display = 'block';
+}
+
+// ═══════════════════════════════════════
+//  VENDAS
+// ═══════════════════════════════════════
+function resumoVenda(){
+  var sels=[...document.querySelectorAll('.vPerfSel')];
+  var qs=[...document.querySelectorAll('.vQtdSel')];
+  var descTotal = parseFloat(document.getElementById('vDesconto').value) || 0;
+  var total=0, lucro=0;
+  var itens=sels.map(function(x,i){return {p:perfumes.find(function(p){return p.id==x.value;}),q:+qs[i].value};}).filter(function(x){return x.p&&x.q>0;});
+  
+  const el=document.getElementById('resumoDiv');
+  if(itens.length > 0){
+    itens.forEach(function(i){
+      total += i.p.venda * i.q;
+      lucro += (i.p.venda - i.p.compra) * i.q;
+    });
+    total -= descTotal;
+    lucro -= descTotal;
+    el.style.display='block';
+    el.innerHTML=`💰 Total da Venda: <b>${R$(total)}</b> &nbsp;·&nbsp; 📈 Lucro Estimado: <b style="color:#4caf50">${R$(lucro)}</b>`;
+  } else {
+    el.style.display='none';
+  }
+}
+
+let linhasVenda=0;
+function addLinhaVenda(){
+ linhasVenda++;
+ let d=document.createElement('div');
+ d.id='linhaVenda'+linhasVenda;
+ d.style='display:flex;gap:8px;margin-bottom:8px;';
+ d.innerHTML=`<select class="vPerfSel" onchange="resumoVenda()" style="flex:1"><option value="">Selecione o perfume</option></select><input class="vQtdSel" oninput="resumoVenda()" type="number" min="1" value="1" style="width:70px"><button class="btn-del" onclick="this.parentElement.remove();resumoVenda();">🗑</button>`;
+ document.getElementById('listaVendaProdutos').appendChild(d);
+ atualizarSelectsVenda();
+}
+
+function atualizarSelectsVenda(){
+ document.querySelectorAll('.vPerfSel').forEach(sel=>{
+   const atual=sel.value;
+   sel.innerHTML='<option value="">Selecione o perfume</option>'+perfumes.map(p=>`<option value="${p.id}">${p.nome} (${p.estoque})</option>`).join('');
+   sel.value=atual;
+ });
+}
+
+function vender(){
+ try{
+   var sels=[...document.querySelectorAll('.vPerfSel')];
+   var qs=[...document.querySelectorAll('.vQtdSel')];
+   var descTotal = parseFloat(document.getElementById('vDesconto').value) || 0;
+   
+   var qtdPorPerfume = {};
+   var itens = [];
+   
+   for(var i=0; i<sels.length; i++){
+     var pid = sels[i].value;
+     var q = parseInt(qs[i].value) || 0;
+     if(pid && q > 0){
+       qtdPorPerfume[pid] = (qtdPorPerfume[pid] || 0) + q;
+       var pObj = perfumes.find(p => p.id === pid);
+       itens.push({p: pObj, q: q});
+     }
+   }
+
+   if(!itens.length){toast('Selecione ao menos um perfume!','err');return;}
+   
+   for(var pid in qtdPorPerfume){
+     var pObj = perfumes.find(p => p.id === pid);
+     if(pObj.estoque < qtdPorPerfume[pid]){
+       toast('Estoque insuficiente para: ' + pObj.nome + ' (Disponível: ' + pObj.estoque + ')', 'err');
+       return;
+     }
+   }
+
+   var batch=db.batch(),total=0,lucro=0;
+   itens.forEach(function(i){
+     batch.update(db.collection('perfumes').doc(i.p.id),{estoque:i.p.estoque-i.q,vendidos:(i.p.vendidos||0)+i.q});
+     total+=i.p.venda*i.q;
+     lucro+=(i.p.venda-i.p.compra)*i.q;
+   });
+   total -= descTotal;
+   lucro -= descTotal;
+
+   var clienteId=document.getElementById('vCliente').value;
+   var clienteObj=clientes.find(function(c){return c.id==clienteId;});
+   var clienteNome=clienteObj?clienteObj.nome:'—';
+   var vendedor=document.getElementById('vVendedor').value;
+   var pagamento=document.getElementById('vPagamento').value;
+   var obs=document.getElementById('vObs').value;
+   batch.set(db.collection('vendas').doc(),{
+     produto:itens.map(function(i){return i.p.nome;}).join(', '),
+     quantidade:itens.reduce(function(a,b){return a+b.q;},0),
+     valor:total,lucro:lucro,desconto:descTotal,cliente:clienteNome,vendedor:vendedor,pagamento:pagamento,obs:obs,data:new Date()
+   });
+   batch.commit()
+     .then(function(){
+       toast('✅ Venda registrada! Total: '+R$(total));
+       document.getElementById('listaVendaProdutos').innerHTML='';
+       document.getElementById('vDesconto').value='';
+       linhasVenda=0;
+       addLinhaVenda();
+       document.getElementById('vObs').value='';
+       resumoVenda();
+     })
+     .catch(function(e){toast('Erro ao salvar: '+e.message,'err');});
+ }catch(e){
+   toast('Erro: '+e.message,'err');
+   console.error(e);
+ }
+}
+
+db.collection('vendas').onSnapshot(
+  snap=>{
+    vendas=[];
+    const tb=document.getElementById('tbVendas');
+    let fat=0,luc=0;
+    if(snap.empty){
+      tb.innerHTML='<tr><td colspan="10" class="vazio">Nenhuma venda ainda.</td></tr>';
+      atualizarFinanceiro(0,0);return;
+    }
+    const docs=[];
+    snap.forEach(d=>docs.push({id:d.id,...d.data()}));
+    docs.sort((a,b)=>{
+      const da=a.data&&a.data.toDate?a.data.toDate():new Date(a.data||0);
+      const db2=b.data&&b.data.toDate?b.data.toDate():new Date(b.data||0);
+      return db2-da;
+    });
+    vendas=docs;tb.innerHTML='';
+    docs.forEach(v=>{
+      fat+=v.valor||0;luc+=v.lucro||0;
+      let comissao = vendedorEhJurema(v.vendedor) ? ((v.valor||0) * 0.10) : 0;
+      tb.innerHTML+=`<tr>
+        <td><b style="color:#e8c8d4">${v.produto}</b></td>
+        <td style="color:#8a6070">${v.cliente||'—'}</td>
+        <td>${v.quantidade}</td>
+        <td style="color:#d4af37">${R$(v.valor)}</td>
+        <td style="color:#c62828">${R$(v.desconto)}</td>
+        <td style="color:#8a6070">${v.pagamento||'—'}</td>
+        <td style="color:#e8c8d4">${v.vendedor||'—'}</td>
+        <td style="color:#ce93d8;font-weight:700">${R$(comissao)}</td>
+        <td style="color:#666">${dataBR(v.data)}</td>
+        <td>
+          <input type="text" value="${v.obs||''}" placeholder="Obs..." onchange="updateDoc('vendas','${v.id}',{obs:this.value})" style="width:80px;font-size:10px;padding:4px;margin:0;background:transparent;border:1px solid #3a1025;color:#8a6070">
+        </td>
+        <td><button class="btn-del" onclick="delVenda('${v.id}','${v.produto}',${v.quantidade})">🗑</button></td>
+      </tr>`;
+    });
+    atualizarFinanceiro(fat,luc);
+    erroEl('erroVendas','');
+    renderRelatorios();
+  },
+  err=>{erroEl('erroVendas','Erro ao carregar vendas.');console.error(err);}
+);
+
+function atualizarFinanceiro(fat,luc){
+  lucroTotal=luc;
+  document.getElementById('kFat').textContent=R$(fat);
+  document.getElementById('kLucro').textContent=R$(luc);
+  const diz=luc*0.1;
+  document.getElementById('dizimoInicioVal').textContent=R$(diz);
+  document.getElementById('dizimoInicioSub').textContent='Lucro total: '+R$(luc);
+}
+
+// ═══════════════════════════════════════
+//  RELATÓRIOS
+// ═══════════════════════════════════════
+function renderRelatorios(){
+  const dR=document.getElementById('rRanking');
+  const dL=document.getElementById('rLucro');
+  const dM=document.getElementById('rMeses');
+  if(!dR)return;
+  const sorted=[...perfumes].sort((a,b)=>(b.vendidos||0)-(a.vendidos||0));
+  if(!sorted.length){
+    dR.innerHTML='<div class="vazio">Sem dados.</div>';
+    dL.innerHTML='<div class="vazio">Sem dados.</div>';
+  }else{
+    dR.innerHTML=sorted.map((p,i)=>{
+      const cls=i===0?'r1':i===1?'r2':i===2?'r3':'rx';
+      return `<div class="rank-item">
+        <div class="rn ${cls}">${i+1}</div>
+        <div style="flex:1"><b style="color:#e8c8d4">${p.nome}</b><br><span style="font-size:11px;color:#666">${p.vendidos||0} vendidos</span></div>
+        <div style="font-size:13px;font-weight:700;color:#d4af37">${R$((p.venda||0)*(p.vendidos||0))}</div>
+      </div>`;
+    }).join('');
+    const ls=[...perfumes].sort((a,b)=>((b.venda-b.compra)*(b.vendidos||0))-((a.venda-a.compra)*(a.vendidos||0)));
+    dL.innerHTML=ls.map((p,i)=>{
+      const cls=i===0?'r1':i===1?'r2':i===2?'r3':'rx';
+      const luc=(p.venda-p.compra)*(p.vendidos||0);
+      return `<div class="rank-item">
+        <div class="rn ${cls}">${i+1}</div>
+        <div style="flex:1"><b style="color:#e8c8d4">${p.nome}</b><br><span style="font-size:11px;color:#666">+${R$(p.venda-p.compra)}/un</span></div>
+        <div style="font-size:13px;font-weight:700;color:#4caf50">${R$(luc)}</div>
+      </div>`;
+    }).join('');
+  }
+  if(vendas.length){
+    const map={};
+    vendas.forEach(v=>{
+      const d=v.data&&v.data.toDate?v.data.toDate():new Date(v.data||0);
+      if(!isNaN(d.getTime())){
+        const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        if(!map[k])map[k]={fat:0,luc:0,qtd:0};
+        map[k].fat+=v.valor||0;map[k].luc+=v.lucro||0;map[k].qtd++;
+      }
+    });
+    const mn=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    dM.innerHTML=Object.entries(map).sort((a,b)=>b[0].localeCompare(a[0])).map(([k,v])=>{
+      const [ano,mes]=k.split('-');
+      return `<div class="rank-item">
+        <div class="rn rx" style="width:38px;border-radius:6px;font-size:10px">${mn[mes-1]}<br>${ano}</div>
+        <div style="flex:1"><b style="color:#e8c8d4">${v.qtd} vendas</b><br><span style="font-size:11px;color:#666">Lucro: ${R$(v.luc)}</span></div>
+        <div style="font-size:13px;font-weight:700;color:#d4af37">${R$(v.fat)}</div>
+      </div>`;
+    }).join('');
+  }else{dM.innerHTML='<div class="vazio">Sem dados.</div>';}
+}
+
+// ═══════════════════════════════════════
+//  DELETE
+// ═══════════════════════════════════════
+function del(col,id){
+  db.collection(col).doc(id).delete()
+    .then(()=>toast('Removido!'))
+    .catch(e=>toast('Erro ao remover: '+e.message,'err'));
+}
+
+function updateDoc(col,id,data){
+  db.collection(col).doc(id).update(data)
+    .then(()=>toast('Atualizado!'))
+    .catch(e=>toast('Erro ao atualizar: '+e.message,'err'));
+}
+
+function delVenda(id,nomeProduto,qtd){
+  const p=perfumes.find(x=>x.nome===nomeProduto);
+  const batch=db.batch();
+  batch.delete(db.collection('vendas').doc(id));
+  if(p){
+    batch.update(db.collection('perfumes').doc(p.id),{
+      estoque:p.estoque+Number(qtd),
+      vendidos:Math.max(0,(p.vendidos||0)-Number(qtd))
+    });
+  }
+  batch.commit()
+    .then(()=>toast('Venda removida e estoque estornado!'))
+    .catch(e=>toast('Erro: '+e.message,'err'));
+}
+
+window.addEventListener('load',function(){
+  if(document.getElementById('listaVendaProdutos'))addLinhaVenda();
+});
+</script>
+</body>
+</html>
